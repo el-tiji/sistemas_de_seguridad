@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: sgsi_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sgsi
+      MYSQL_USER: sgsi_user
+      MYSQL_PASSWORD: sgsi_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./src/backend/db/db.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build: .
+    container_name: sgsi_api
+    depends_on:
+      - mysql
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    command: uvicorn src.backend.main:app --host 0.0.0.0 --port 8000 --reload
