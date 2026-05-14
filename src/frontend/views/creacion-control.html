@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gestión de Controles</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+            background-color: #f4f4f4;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+
+        input, select {
+            display: block;
+            margin: 10px 0;
+            padding: 8px;
+            width: 100%;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Gestión de Controles</h2>
+
+<!-- FORMULARIO -->
+<form id="controlForm">
+    <input type="text" id="codigo" placeholder="Código del control" required>
+    <input type="text" id="descripcion" placeholder="Descripción" required>
+
+    <select id="estado">
+        <option value="Implementado">Implementado</option>
+        <option value="En proceso">En proceso</option>
+        <option value="No implementado">No implementado</option>
+    </select>
+
+    <button type="submit">Crear Control</button>
+</form>
+
+<!-- TABLA -->
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody id="tablaControles"></tbody>
+</table>
+
+<script>
+async function cargarControles() {
+    const response = await fetch("/controls/list");
+    const data = await response.json();
+
+    const tabla = document.getElementById("tablaControles");
+    tabla.innerHTML = "";
+
+    data.forEach(control => {
+        tabla.innerHTML += `
+            <tr>
+                <td>${control.id}</td>
+                <td>${control.codigo}</td>
+                <td>${control.descripcion}</td>
+                <td>${control.estado}</td>
+            </tr>
+        `;
+    });
+}
+
+document.getElementById("controlForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const codigo = document.getElementById("codigo").value;
+    const descripcion = document.getElementById("descripcion").value;
+    const estado = document.getElementById("estado").value;
+
+    await fetch("/controls/create", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ codigo, descripcion, estado })
+    });
+
+    document.getElementById("controlForm").reset();
+    cargarControles();
+});
+
+cargarControles();
+</script>
+
+</body>
+</html>

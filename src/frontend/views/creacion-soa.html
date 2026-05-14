@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gestión de SoA</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+            background-color: #f4f4f4;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Declaración de Aplicabilidad (SoA)</h2>
+
+<button onclick="generarSoA()">Generar Nueva SoA</button>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Versión</th>
+            <th>Fecha</th>
+            <th>Acción</th>
+        </tr>
+    </thead>
+    <tbody id="tablaSoA"></tbody>
+</table>
+
+<h3>Detalle</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th>Incluido</th>
+            <th>Justificación</th>
+        </tr>
+    </thead>
+    <tbody id="detalleSoA"></tbody>
+</table>
+
+<script>
+
+async function cargarSoA() {
+    const response = await fetch("/soa/list");
+    const data = await response.json();
+
+    const tabla = document.getElementById("tablaSoA");
+    tabla.innerHTML = "";
+
+    data.forEach(soa => {
+        tabla.innerHTML += `
+            <tr>
+                <td>${soa.id}</td>
+                <td>${soa.version}</td>
+                <td>${soa.fecha}</td>
+                <td>
+                    <button onclick="verDetalle(${soa.id})">
+                        Ver Detalle
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+async function generarSoA() {
+    await fetch("/soa/generate", { method: "POST" });
+    cargarSoA();
+}
+
+async function verDetalle(id) {
+    const response = await fetch(`/soa/detail/${id}`);
+    const data = await response.json();
+
+    const tabla = document.getElementById("detalleSoA");
+    tabla.innerHTML = "";
+
+    data.forEach(item => {
+        tabla.innerHTML += `
+            <tr>
+                <td>${item.codigo}</td>
+                <td>${item.descripcion}</td>
+                <td>${item.incluido}</td>
+                <td>${item.justificacion}</td>
+            </tr>
+        `;
+    });
+}
+
+cargarSoA();
+
+</script>
+
+</body>
+</html>

@@ -35,10 +35,22 @@ app.include_router(controles_router)
 def login():
     return FileResponse("src/frontend/views/login.html")
 
+@app.get("/crear-cuenta")
+def crear_cuenta():
+    return FileResponse("src/frontend/views/creacion-cuenta.html")
+
 @app.get("/dashboard")
 def dashboard():
     return FileResponse("src/frontend/views/dashboard.html")
 
+@app.get("/controles")
+def controles():
+    return FileResponse("src/frontend/views/creacion-control.html")
+
+@app.get("/soa")
+def soa():
+    return FileResponse("src/frontend/views/creacion-soa.html")
+
 
 if __name__ == "__main__":
-    uvicorn.run("src.backend.main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("src.backend.main:app", host="0.0.0.0", port=5000, reload=True)

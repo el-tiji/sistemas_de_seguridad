@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Form, Depends, HTTPException
 from fastapi.responses import RedirectResponse
-from httpcore import request
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from passlib.context import CryptContext
@@ -24,9 +23,24 @@ def registar_control(
 
     try:
         db.execute(text("""
-            INSERT INTO controles (codigo, descripcion, estado) VALUES (:codigo, :descripcion, :estado)
+            INSERT INTO control (codigo, descripcion, estado) VALUES (:codigo, :descripcion, :estado)
         """), {"codigo": codigo, "descripcion": descripcion, "estado": estado})
         db.commit()
         return RedirectResponse(url="/dashboard", status_code=303)
     except Exception as e:
         raise HTTPException(status_code=400, detail="Error al crear el control")
+    
+@router.get("/listar-controles")
+def listar_controles(db: Session = Depends(get_db)):
+    result = db.execute(text("SELECT id, codigo, descripcion, estado FROM control"))
+    controles = result.fetchall()
+
+    return [
+        {
+            "id": c[0],
+            "codigo": c[1],
+            "descripcion": c[2],
+            "estado": c[3]
+        }
+        for c in controles
+    ]

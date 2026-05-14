@@ -12,31 +12,33 @@ pwd_context = CryptContext(schemes=["pbkdf2_sha256"],deprecated="auto")
 
 @router.post("/register")
 def register(
-    username: str = Form(...), 
-    password: str = Form(...), 
+    email: str = Form(...), 
+    password: str = Form(...),
+    rol: str = Form(...), 
     db: Session = Depends(get_db)
 ):
     hashed_password = pwd_context.hash(password)
 
     try:
         db.execute(text("""
-            INSERT INTO users (username, password) VALUES (:username, :password)
-        """), {"username": username, "password": hashed_password})
+            INSERT INTO usuario (email, password, rol) VALUES (:email, :password, :rol)
+        """), {"email": email, "password": hashed_password, "rol": rol})
         db.commit()
-        return RedirectResponse(url="/login", status_code=303)
+        return RedirectResponse(url="/", status_code=303)
     except Exception as e:
-        raise HTTPException(status_code=400, detail="Error al registrar el usuario")
+        print(e)
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/login")
 def login(
     request: Request,
-    username: str = Form(...), 
+    email: str = Form(...), 
     password: str = Form(...), 
     db: Session = Depends(get_db)
 ):
     result = db.execute(text("""
-        SELECT * FROM users WHERE username = :username
-    """), {"username": username}).fetchone()
+        SELECT * FROM usuario WHERE email = :email
+    """), {"email": email}).fetchone()
 
     if not result or not pwd_context.verify(password, result.password):
         raise HTTPException(status_code=400, detail="Credenciales inválidas")

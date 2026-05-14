@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard SGSI</title>
+
+    <style>
+        body{
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+        }
+
+        .card{
+            background:white;
+            padding:40px;
+            border-radius:10px;
+            width:400px;
+            box-shadow:0px 0px 10px rgba(0,0,0,0.1);
+            text-align:center;
+        }
+
+        h2{
+            margin-bottom:30px;
+        }
+
+        .btn{
+            display:block;
+            width:100%;
+            padding:12px;
+            margin-bottom:15px;
+            background:#007bff;
+            color:white;
+            text-decoration:none;
+            border-radius:5px;
+            font-weight:bold;
+        }
+
+        .btn:hover{
+            background:#0056b3;
+        }
+
+        .btn-green{
+            background:#28a745;
+        }
+
+        .btn-green:hover{
+            background:#1f7d34;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+
+        <h2>Dashboard SGSI</h2>
+
+        <a href="/controles" class="btn">
+            Crear Control ISO
+        </a>
+
+        <a href="/soa" class="btn btn-green">
+            Crear SoA
+        </a>
+
+        <button class="btn" onclick="generarSoA()">
+            Generar SoA Automático
+        </button>
+
+    </div>
+
+    <script>
+        function generarSoA(){
+            fetch("/generate_soa", {
+                method:"POST"
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+            });
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Creacion de cuentas - Proyecto Drones</title>
+  <style>
+    body {
+            font-family: Arial;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 350px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+  </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <form action="/register" method="POST"
+        class="bg-white p-8 rounded-xl shadow-lg w-96">
+
+    <h1 class="text-2xl font-bold text-center mb-6">
+      Sistema SGSI
+    </h1>
+
+    <input
+      type="email"
+      name="email"
+      placeholder="Correo"
+      required
+      class="w-full mb-6 p-2 border rounded"
+    >
+
+    <input
+      type="password"
+      name="password"
+      placeholder="Contraseña"
+      required
+      class="w-full mb-6 p-2 border rounded"
+    >
+
+    <select 
+    name="rol" 
+    required 
+    class="w-full mb-6 p-2 border rounded"
+    >
+    <option value="">Selecciona un rol</option>
+    <option value="empresa">Empresa</option>
+    <option value="usuario">Usuario</option>
+    </select>
+
+    <button
+      type="submit"
+      class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+      Registrar
+    </button>
+
+
+  </form>
+
+</body>
+</html>
