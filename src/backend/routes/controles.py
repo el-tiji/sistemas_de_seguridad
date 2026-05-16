@@ -7,6 +7,7 @@ from fastapi import Request
 
 from src.backend.config.db import get_db
 
+# Rutas para la gestión de controles en el SGSI
 router = APIRouter()
 
 @router.post("/crear-control")

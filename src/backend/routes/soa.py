@@ -6,7 +6,7 @@ from src.backend.config.db import get_db
 
 router = APIRouter(prefix="/soa", tags=["SoA"])
 
-
+# Rutas para la gestión de SoA (Declaración de Aplicabilidad)
 @router.post("/generate")
 def generate_soa(db: Session = Depends(get_db)):
 
