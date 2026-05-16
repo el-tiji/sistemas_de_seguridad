@@ -9,7 +9,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from src.backend.routes.users import router as users_router
 from src.backend.routes.controles import router as controles_router
 
-  
+#configuracion de fastapi 
 app = FastAPI( 
 
     title="Proyecto sgsi", 

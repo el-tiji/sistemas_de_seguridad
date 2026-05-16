@@ -7,6 +7,7 @@ from fastapi import Request
 
 from src.backend.config.db import get_db
 
+# Rutas para la gestión de usuarios (registro y login)
 router = APIRouter()
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"],deprecated="auto")
 

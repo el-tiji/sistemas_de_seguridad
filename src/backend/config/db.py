@@ -3,7 +3,7 @@ from sqlalchemy import create_engine,text
 from sqlalchemy.orm import sessionmaker, declarative_base 
 
   
-
+# Configuración de la conexión a la base de datos MySQL usando SQLAlchemy
 DATABASE_URL = "mysql+pymysql://sgsi_user:sgsi_password@mysql:3306/sgsi"
 
   
