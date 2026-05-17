@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizaciones SGSI</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <h1>Gestión de Organizaciones</h1>
+
+    <!-- ========================= -->
+    <!-- FORMULARIO -->
+    <!-- ========================= -->
+
+    <div class="container">
+
+        <h2>Crear Organización</h2>
+
+        <form action="/organizaciones/crear-organizacion" method="POST">
+
+            <label>Nombre:</label>
+            <input type="text" name="nombre" required>
+
+            <label>Descripción:</label>
+            <textarea name="descripcion"></textarea>
+
+            <label>Alcance SGSI:</label>
+            <textarea name="alcance_sgsi" required></textarea>
+
+            <button type="submit">
+                Crear Organización
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- TABLA -->
+    <!-- ========================= -->
+
+    <div class="container">
+
+        <h2>Listado de Organizaciones</h2>
+
+        <table border="1" width="100%">
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Alcance SGSI</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+
+            <tbody id="tablaOrganizaciones">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- SCRIPT -->
+    <!-- ========================= -->
+
+    <script>
+
+        async function cargarOrganizaciones() {
+
+            const response = await fetch("/organizaciones/listar-organizaciones");
+            const data = await response.json();
+
+            const tabla = document.getElementById("tablaOrganizaciones");
+
+            tabla.innerHTML = "";
+
+            data.forEach(org => {
+
+                tabla.innerHTML += `
+                    <tr>
+                        <td>${org.id}</td>
+                        <td>${org.nombre}</td>
+                        <td>${org.descripcion}</td>
+                        <td>${org.alcance_sgsi}</td>
+                        <td>${org.fecha_creacion}</td>
+                    </tr>
+                `;
+
+            });
+
+        }
+
+        cargarOrganizaciones();
+
+    </script>
+
+</body>
+</html>

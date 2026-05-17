@@ -68,6 +68,10 @@
             Crear SoA
         </a>
 
+        <a href="/organizaciones" class="btn">
+            Gestionar Organizaciones
+        </a>
+
         <button class="btn" onclick="generarSoA()">
             Generar SoA Automático
         </button>
@@ -76,7 +80,7 @@
 
     <script>
         function generarSoA(){
-            fetch("/generate_soa", {
+            fetch("/organizaciones/generate_soa", {
                 method:"POST"
             })
             .then(res => res.json())

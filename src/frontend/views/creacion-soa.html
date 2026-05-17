@@ -75,7 +75,7 @@
 <script>
 
 async function cargarSoA() {
-    const response = await fetch("/soa/list");
+    const response = await fetch("/api/soa/list-soa");
     const data = await response.json();
 
     const tabla = document.getElementById("tablaSoA");
@@ -98,12 +98,12 @@ async function cargarSoA() {
 }
 
 async function generarSoA() {
-    await fetch("/soa/generate", { method: "POST" });
+    await fetch("/api/soa/generate", { method: "POST" });
     cargarSoA();
 }
 
 async function verDetalle(id) {
-    const response = await fetch(`/soa/detail/${id}`);
+    const response = await fetch(`/api/soa/detail/${id}`);
     const data = await response.json();
 
     const tabla = document.getElementById("detalleSoA");

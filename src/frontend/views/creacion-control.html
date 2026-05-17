@@ -88,7 +88,7 @@
 
 <script>
 async function cargarControles() {
-    const response = await fetch("/listar-controles");
+    const response = await fetch("/api/control/listar-controles");
     const data = await response.json();
 
     const tabla = document.getElementById("tablaControles");
@@ -113,7 +113,7 @@ document.getElementById("controlForm").addEventListener("submit", async function
     const descripcion = document.getElementById("descripcion").value;
     const estado = document.getElementById("estado").value;
 
-    await fetch("/crear-control", {
+    await fetch("/api/control/crear-control", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

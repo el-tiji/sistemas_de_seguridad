@@ -8,6 +8,8 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 from src.backend.routes.users import router as users_router
 from src.backend.routes.controles import router as controles_router
+from src.backend.routes.soa import router as soa_router 
+from src.backend.routes.organizacion import router as organizacion_router
 
 #configuracion de fastapi 
 app = FastAPI( 
@@ -30,6 +32,8 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 #rutas
 app.include_router(users_router)
 app.include_router(controles_router)
+app.include_router(soa_router)
+app.include_router(organizacion_router)
 
 @app.get("/")
 def login():
@@ -50,6 +54,10 @@ def controles():
 @app.get("/soa")
 def soa():
     return FileResponse("src/frontend/views/creacion-soa.html")
+
+@app.get("/organizaciones")
+def organizaciones():
+    return FileResponse("src/frontend/views/organizaciones.html")
 
 
 if __name__ == "__main__":
