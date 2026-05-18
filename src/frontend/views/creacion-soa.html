@@ -1,4 +1,3 @@
-// Vista para la gestión de SoA (Declaración de Aplicabilidad)
 <!DOCTYPE html>
 <html>
 <head>
@@ -98,24 +97,48 @@ async function cargarSoA() {
 }
 
 async function generarSoA() {
-    await fetch("/api/soa/generate", { method: "POST" });
+
+    const formData = new FormData();
+
+    formData.append("organizacion_id", 1);
+    formData.append("responsable", "Administrador");
+    formData.append("descripcion", "SoA generada automáticamente");
+
+    const response = await fetch("/api/soa/generate", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        alert(data.detail);
+        return;
+    }
+
+    alert(data.message);
+
     cargarSoA();
 }
 
 async function verDetalle(id) {
+
     const response = await fetch(`/api/soa/detail/${id}`);
+
     const data = await response.json();
 
     const tabla = document.getElementById("detalleSoA");
+
     tabla.innerHTML = "";
 
     data.forEach(item => {
+
         tabla.innerHTML += `
             <tr>
                 <td>${item.codigo}</td>
                 <td>${item.descripcion}</td>
-                <td>${item.incluido}</td>
-                <td>${item.justificacion}</td>
+                <td>${item.aplica}</td>
+                <td>${item.justificacion_inclusion}</td>
             </tr>
         `;
     });

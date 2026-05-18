@@ -43,15 +43,15 @@ def generate_soa(
         # =========================================
         last_version = db.execute(
             text("""
-                SELECT MAX(id)
+                SELECT MAX(version)
                 FROM soa
             """)
         ).scalar()
 
         if last_version is None:
-            new_version = "v1"
+            new_version = 1
         else:
-            new_version = f"v{last_version + 1}"
+            new_version = last_version + 1
 
         # =========================================
         # CREAR SOA

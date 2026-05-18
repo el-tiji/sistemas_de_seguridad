@@ -52,6 +52,32 @@ CREATE TABLE soa (
     ON DELETE CASCADE
 );
 
+CREATE TABLE soa_control (
+
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    soa_id INT NOT NULL,
+
+    control_id INT NOT NULL,
+
+    aplica BOOLEAN NOT NULL,
+
+    justificacion_inclusion TEXT,
+
+    justificacion_exclusion TEXT,
+
+    estado_implementacion VARCHAR(50),
+
+    FOREIGN KEY (soa_id)
+        REFERENCES soa(id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (control_id)
+        REFERENCES control(id)
+        ON DELETE CASCADE
+
+);
+
 -- =========================
 -- SOA DETALLE
 -- Relación entre SOA y Controles

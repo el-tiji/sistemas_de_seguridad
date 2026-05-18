@@ -1,4 +1,3 @@
-// Vista para la gestión de controles en el SGSI
 <!DOCTYPE html>
 <html>
 <head>
@@ -88,13 +87,16 @@
 
 <script>
 async function cargarControles() {
+
     const response = await fetch("/api/control/listar-controles");
     const data = await response.json();
 
     const tabla = document.getElementById("tablaControles");
+
     tabla.innerHTML = "";
 
     data.forEach(control => {
+
         tabla.innerHTML += `
             <tr>
                 <td>${control.id}</td>
@@ -106,26 +108,52 @@ async function cargarControles() {
     });
 }
 
-document.getElementById("controlForm").addEventListener("submit", async function(e) {
+document.getElementById("controlForm")
+.addEventListener("submit", async function(e) {
+
     e.preventDefault();
 
-    const codigo = document.getElementById("codigo").value;
-    const descripcion = document.getElementById("descripcion").value;
-    const estado = document.getElementById("estado").value;
+    const formData = new FormData();
 
-    await fetch("/api/control/crear-control", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ codigo, descripcion, estado })
-    });
+    formData.append(
+        "codigo",
+        document.getElementById("codigo").value
+    );
+
+    formData.append(
+        "descripcion",
+        document.getElementById("descripcion").value
+    );
+
+    formData.append(
+        "estado",
+        document.getElementById("estado").value
+    );
+
+    const response = await fetch(
+        "/api/control/crear-control",
+        {
+            method: "POST",
+            body: formData
+        }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        alert(data.detail);
+        return;
+    }
+
+    alert(data.message);
 
     document.getElementById("controlForm").reset();
+
     cargarControles();
 });
 
 cargarControles();
+
 </script>
 
 </body>
