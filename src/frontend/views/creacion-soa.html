@@ -90,6 +90,10 @@ async function cargarSoA() {
                     <button onclick="verDetalle(${soa.id})">
                         Ver Detalle
                     </button>
+
+                    <button onclick="descargarDocumento(${soa.id})">
+                        Descargar Word
+                    </button>
                 </td>
             </tr>
         `;
@@ -142,6 +146,10 @@ async function verDetalle(id) {
             </tr>
         `;
     });
+}
+
+function descargarDocumento(id) {
+    window.open(`/api/soa/generate-doc/${id}`, '_blank');
 }
 
 cargarSoA();

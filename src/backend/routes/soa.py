@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Form
 from sqlalchemy.orm import Session
 from sqlalchemy import text
+from fastapi.responses import FileResponse
+from docx import Document
+import os
 
 from src.backend.config.db import get_db
 
@@ -240,54 +243,132 @@ def detalle_soa(
             detail=f"Error al obtener detalle SoA: {str(e)}"
         )
 
+
+
 # =========================================
-# ELIMINAR SOA
+# GENERAR DOCUMENTO WORD DEL SOA
 # =========================================
-@router.delete("/delete/{soa_id}")
-def eliminar_soa(
+@router.get("/generate-doc/{soa_id}")
+def generar_documento_soa(
     soa_id: int,
     db: Session = Depends(get_db)
 ):
 
     try:
 
-        existe = db.execute(
-            text("""
-                SELECT id
-                FROM soa
-                WHERE id = :id
-            """),
-            {"id": soa_id}
-        ).fetchone()
+        # =========================================
+        # OBTENER SOA
+        # =========================================
+        soa = db.execute(text("""
+            SELECT
+                s.id,
+                s.version,
+                s.fecha,
+                s.responsable,
+                s.descripcion,
+                s.estado,
+                o.nombre
+            FROM soa s
+            JOIN organizacion o
+                ON s.organizacion_id = o.id
+            WHERE s.id = :soa_id
+        """), {
+            "soa_id": soa_id
+        }).fetchone()
 
-        if not existe:
+        if not soa:
             raise HTTPException(
                 status_code=404,
                 detail="SoA no encontrada"
             )
 
-        db.execute(
-            text("""
-                DELETE FROM soa
-                WHERE id = :id
-            """),
-            {"id": soa_id}
+        # =========================================
+        # OBTENER CONTROLES
+        # =========================================
+        controles = db.execute(text("""
+            SELECT
+                c.codigo,
+                c.descripcion,
+                sc.aplica,
+                sc.justificacion_inclusion,
+                sc.estado_implementacion
+            FROM soa_control sc
+            JOIN control c
+                ON sc.control_id = c.id
+            WHERE sc.soa_id = :soa_id
+        """), {
+            "soa_id": soa_id
+        }).fetchall()
+
+        # =========================================
+        # CREAR DOCUMENTO
+        # =========================================
+        doc = Document()
+
+        doc.add_heading(
+            'Declaración de Aplicabilidad (SoA)',
+            level=1
         )
 
-        db.commit()
+        doc.add_paragraph(f"Organización: {soa[6]}")
+        doc.add_paragraph(f"Versión: {soa[1]}")
+        doc.add_paragraph(f"Fecha: {soa[2]}")
+        doc.add_paragraph(f"Responsable: {soa[3]}")
+        doc.add_paragraph(f"Estado: {soa[5]}")
+        doc.add_paragraph(f"Descripción: {soa[4]}")
 
-        return {
-            "message": "SoA eliminada correctamente"
-        }
+        doc.add_heading('Controles', level=2)
+
+        # =========================================
+        # TABLA
+        # =========================================
+        table = doc.add_table(rows=1, cols=5)
+        table.style = 'Table Grid'
+
+        hdr = table.rows[0].cells
+
+        hdr[0].text = 'Código'
+        hdr[1].text = 'Descripción'
+        hdr[2].text = 'Aplica'
+        hdr[3].text = 'Justificación'
+        hdr[4].text = 'Estado'
+
+        for control in controles:
+
+            row = table.add_row().cells
+
+            row[0].text = str(control[0])
+            row[1].text = str(control[1])
+            row[2].text = 'Sí' if control[2] else 'No'
+            row[3].text = str(control[3])
+            row[4].text = str(control[4])
+
+        # =========================================
+        # GUARDAR ARCHIVO
+        # =========================================
+        output_dir = "generated_docs"
+
+        os.makedirs(output_dir, exist_ok=True)
+
+        file_path = f"{output_dir}/soa_{soa_id}.docx"
+
+        doc.save(file_path)
+
+        # =========================================
+        # RETORNAR ARCHIVO
+        # =========================================
+        return FileResponse(
+            path=file_path,
+            filename=f"soa_{soa_id}.docx",
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        )
 
     except HTTPException:
         raise
 
     except Exception as e:
 
-        db.rollback()
-
         raise HTTPException(
             status_code=500,
-            detail=f"Error al eliminar SoA: {str(e)}"
+            detail=f"Error al generar documento: {str(e)}"
         )
