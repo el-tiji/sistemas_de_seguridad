@@ -45,4 +45,16 @@ def login(
         raise HTTPException(status_code=400, detail="Credenciales inválidas")
 
     request.session["user_id"] = result.id
+    request.session["email"] = result.email
+    request.session["rol"] = result.rol
     return RedirectResponse(url="/dashboard", status_code=303)
+
+@router.get("/logout")
+def logout(request: Request):
+
+    request.session.clear()
+
+    return RedirectResponse(
+        url="/",
+        status_code=303
+    )

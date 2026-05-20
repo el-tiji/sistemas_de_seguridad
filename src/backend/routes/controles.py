@@ -8,6 +8,18 @@ from src.backend.config.db import get_db
 router = APIRouter(prefix="/api/control",
     tags=["Control"])
 
+
+def validar_sesion(request: Request):
+
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="No autenticado"
+        )
+
+    return user_id
 # =========================================
 # CREAR CONTROL
 # =========================================
@@ -21,13 +33,7 @@ def crear_control(
 ):
 
     # Validar sesión
-    user_id = request.session.get("user_id")
-
-    if not user_id:
-        raise HTTPException(
-            status_code=401,
-            detail="No autenticado"
-        )
+    validar_sesion(request)
 
     try:
 
@@ -91,8 +97,10 @@ def crear_control(
 # =========================================
 @router.get("/listar-controles")
 def listar_controles(
+    request: Request,
     db: Session = Depends(get_db)
 ):
+    validar_sesion(request)
 
     try:
 
@@ -130,9 +138,11 @@ def listar_controles(
 # =========================================
 @router.get("/{control_id}")
 def obtener_control(
+    request: Request,
     control_id: int,
     db: Session = Depends(get_db)
 ):
+    validar_sesion(request)
 
     result = db.execute(
         text("""
@@ -165,12 +175,14 @@ def obtener_control(
 # =========================================
 @router.put("/actualizar/{control_id}")
 def actualizar_control(
+    request: Request,
     control_id: int,
     codigo: str = Form(...),
     descripcion: str = Form(...),
     estado: str = Form(...),
     db: Session = Depends(get_db)
 ):
+    validar_sesion(request)
 
     try:
 
@@ -229,9 +241,11 @@ def actualizar_control(
 # =========================================
 @router.delete("/eliminar/{control_id}")
 def eliminar_control(
+    request: Request,
     control_id: int,
     db: Session = Depends(get_db)
 ):
+    validar_sesion(request)
 
     try:
 

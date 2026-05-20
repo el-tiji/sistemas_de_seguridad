@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi import Depends
 import os
+from dotenv import load_dotenv
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
@@ -22,7 +23,7 @@ app = FastAPI(
 
 app.add_middleware(
     SessionMiddleware,
-    secret_key="super-secret-key"
+    secret_key=os.getenv("SECRET_KEY")
 )
 
 app.mount("/static", StaticFiles(directory="src/frontend/public"), name="static")

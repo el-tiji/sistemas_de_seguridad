@@ -14,7 +14,7 @@ services:
       MYSQL_PASSWORD: sgsi_password
 
     ports:
-      - "3307:3306"
+      - "5001:3306"
 
     volumes:
         - ./src/backend/db/database.sql:/docker-entrypoint-initdb.d/database.sql

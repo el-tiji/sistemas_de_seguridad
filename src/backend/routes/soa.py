@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Form
+from fastapi import APIRouter, Depends, HTTPException, Form, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from fastapi.responses import FileResponse
@@ -12,16 +12,31 @@ router = APIRouter(
     tags=["SoA"]
 )
 
+def validar_sesion(request: Request):
+
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="No autenticado"
+        )
+
+    return user_id
+
 # =========================================
 # GENERAR SOA
 # =========================================
 @router.post("/generate")
 def generate_soa(
+    request: Request,
     organizacion_id: int = Form(...),
     responsable: str = Form(...),
     descripcion: str = Form(...),
     db: Session = Depends(get_db)
 ):
+    
+    validar_sesion(request)
 
     try:
 
@@ -154,8 +169,10 @@ def generate_soa(
 # =========================================
 @router.get("/list-soa")
 def listar_soa(
+    request: Request,
     db: Session = Depends(get_db)
 ):
+    validar_sesion(request)
 
     try:
 
@@ -199,9 +216,11 @@ def listar_soa(
 # =========================================
 @router.get("/detail/{soa_id}")
 def detalle_soa(
+    request: Request,
     soa_id: int,
     db: Session = Depends(get_db)
 ):
+    validar_sesion(request)
 
     try:
 
@@ -250,9 +269,11 @@ def detalle_soa(
 # =========================================
 @router.get("/generate-doc/{soa_id}")
 def generar_documento_soa(
+    request: Request,
     soa_id: int,
     db: Session = Depends(get_db)
 ):
+    validar_sesion(request)
 
     try:
 

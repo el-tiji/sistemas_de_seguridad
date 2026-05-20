@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Form, Depends, HTTPException
+from fastapi import APIRouter, Form, Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -9,6 +9,18 @@ from src.backend.config.db import get_db
 router = APIRouter( 
     prefix="/organizaciones",
     tags=["Organizaciones"])
+
+def validar_sesion(request: Request):
+
+    user_id = request.session.get("user_id")
+
+    if not user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="No autenticado"
+        )
+
+    return user_id
 
 # =========================================
 # CREAR ORGANIZACION
@@ -22,13 +34,7 @@ def crear_organizacion(
     db: Session = Depends(get_db)
 ):
 
-    user_id = request.session.get("user_id")
-
-    if not user_id:
-        raise HTTPException(
-            status_code=401,
-            detail="No autenticado"
-        )
+    validar_sesion(request)
 
     try:
 
@@ -69,8 +75,10 @@ def crear_organizacion(
 # =========================================
 @router.get("/listar-organizaciones")
 def listar_organizaciones(
+    request: Request,
     db: Session = Depends(get_db)
 ):
+    validar_sesion(request)
 
     try:
 
@@ -110,9 +118,11 @@ def listar_organizaciones(
 # =========================================
 @router.get("/{organizacion_id}")
 def obtener_organizacion(
+    request: Request,
     organizacion_id: int,
     db: Session = Depends(get_db)
 ):
+    validar_sesion(request)
 
     try:
 
