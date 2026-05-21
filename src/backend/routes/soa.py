@@ -87,40 +87,35 @@ def generate_soa(
         # =========================================
         # CREAR SOA
         # =========================================
-        db.execute(
-            text("""
-                INSERT INTO soa (
-                    organizacion_id,
-                    version,
-                    responsable,
-                    descripcion,
-                    estado
-                )
-                VALUES (
-                    :organizacion_id,
-                    :version,
-                    :responsable,
-                    :descripcion,
-                    :estado
-                )
-            """),
-            {
-                "organizacion_id": organizacion_id,
-                "version": new_version,
-                "responsable": responsable,
-                "descripcion": descripcion,
-                "estado": "ACTIVO"
-            }
-        )
+        result = db.execute(
+        text("""
+            INSERT INTO soa (
+                organizacion_id,
+                version,
+                responsable,
+                descripcion,
+                estado
+            )
+            VALUES (
+                :organizacion_id,
+                :version,
+                :responsable,
+                :descripcion,
+                :estado
+            )
+        """),
+        {
+            "organizacion_id": organizacion_id,
+            "version": new_version,
+            "responsable": responsable,
+            "descripcion": descripcion,
+            "estado": "ACTIVO"
+        }
+    )
 
         db.commit()
 
-        # =========================================
-        # OBTENER ID DEL SOA
-        # =========================================
-        soa_id = db.execute(
-            text("SELECT LAST_INSERT_ID()")
-        ).scalar()
+        soa_id = result.lastrowid
 
         # =========================================
         # INSERTAR CONTROLES
@@ -482,3 +477,27 @@ def actualizar_control_soa(
             status_code=500,
             detail=str(e)
         )
+    
+
+@router.get("/organizations")
+def listar_organizaciones(
+    db: Session = Depends(get_db)
+):
+
+    result = db.execute(text("""
+        SELECT
+            id,
+            nombre
+        FROM organizacion
+        ORDER BY nombre
+    """))
+
+    rows = result.fetchall()
+
+    return [
+        {
+            "id": r[0],
+            "nombre": r[1]
+        }
+        for r in rows
+    ]

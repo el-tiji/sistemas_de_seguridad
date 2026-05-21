@@ -22,6 +22,19 @@
             margin-bottom: 20px;
         }
 
+        form {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -44,7 +57,36 @@
 
 <h2>Declaración de Aplicabilidad (SoA)</h2>
 
-<button onclick="generarSoA()">Generar Nueva SoA</button>
+<form id="soaForm">
+
+    <select id="organizacion" required>
+        <option value="">Seleccione organización</option>
+    </select>
+
+    <label>Seleccionar controles</label>
+
+    <select id="controles" multiple required style="height:200px;">
+    </select>
+
+    <input
+        type="text"
+        id="responsable"
+        placeholder="Responsable"
+        required
+    >
+
+    <input
+        type="text"
+        id="descripcion"
+        placeholder="Descripción del SoA"
+        required
+    >
+
+    <button type="submit">
+        Generar Nueva SoA
+    </button>
+
+</form>
 
 <table>
     <thead>
@@ -64,12 +106,13 @@
         <tr>
             <th>Código</th>
             <th>Descripción</th>
-            <th>Incluido</th>
+            <th>Aplica</th>
             <th>Justificación</th>
             <th>Estado</th>
-            <th>Acciones</th>
+            <th>Acción</th>
         </tr>
     </thead>
+
     <tbody id="detalleSoA"></tbody>
 </table>
 
@@ -102,13 +145,36 @@ async function cargarSoA() {
     });
 }
 
-async function generarSoA() {
+document.getElementById("soaForm")
+.addEventListener("submit", async function(e) {
+
+    e.preventDefault();
+
+    const organizacion_id =
+        document.getElementById("organizacion").value;
+
+    const responsable =
+        document.getElementById("responsable").value;
+
+    const descripcion =
+        document.getElementById("descripcion").value;
+
+    const controlesSelect =
+        document.getElementById("controles");
+
+    const controles =
+        Array.from(controlesSelect.selectedOptions)
+        .map(option => option.value);
 
     const formData = new FormData();
 
-    formData.append("organizacion_id", 1);
-    formData.append("responsable", "Administrador");
-    formData.append("descripcion", "SoA generada automáticamente");
+    formData.append("organizacion_id", organizacion_id);
+    formData.append("responsable", responsable);
+    formData.append("descripcion", descripcion);
+
+    controles.forEach(control => {
+        formData.append("controles", control);
+    });
 
     const response = await fetch("/api/soa/generate", {
         method: "POST",
@@ -125,10 +191,9 @@ async function generarSoA() {
     alert(data.message);
 
     cargarSoA();
-}
+});
 
 async function verDetalle(id) {
-    
 
     const response = await fetch(`/api/soa/detail/${id}`);
 
@@ -141,37 +206,98 @@ async function verDetalle(id) {
     data.forEach(item => {
 
         tabla.innerHTML += `
-        <tr>
-            <td>${item.codigo}</td>
+            <tr>
 
-            <td>${item.descripcion}</td>
+                <td>${item.codigo}</td>
 
-           <td>${item.aplica ? 'Sí' : 'No'}</td>
+                <td>${item.descripcion}</td>
 
-            <td>
-                ${
-                    item.aplica
-                    ? item.justificacion_inclusion
-                    : item.justificacion_exclusion
-                }
-            </td>
+                <td>
+                    <select id="aplica-${item.id}">
+                        <option value="true" ${item.aplica ? "selected" : ""}>
+                            Sí
+                        </option>
 
-            <td>
-                ${item.estado_implementacion}
-            </td>
+                        <option value="false" ${!item.aplica ? "selected" : ""}>
+                            No
+                        </option>
+                    </select>
+                </td>
 
-            <td>
-                <button onclick="incluirControl(${item.id})">
-                    Incluir
-                </button>
+                <td>
+                    <input
+                        type="text"
+                        id="justificacion-${item.id}"
+                        value="${
+                            item.aplica
+                            ? (item.justificacion_inclusion || "")
+                            : (item.justificacion_exclusion || "")
+                        }"
+                    >
+                </td>
 
-                <button onclick="excluirControl(${item.id})">
-                    Excluir
-                </button>
-            </td>
-        </tr>
-    `;
+                <td>
+                    <select id="estado-${item.id}">
+
+                        <option value="PENDIENTE"
+                            ${item.estado_implementacion == "PENDIENTE" ? "selected" : ""}>
+                            PENDIENTE
+                        </option>
+
+                        <option value="IMPLEMENTADO"
+                            ${item.estado_implementacion == "IMPLEMENTADO" ? "selected" : ""}>
+                            IMPLEMENTADO
+                        </option>
+
+                        <option value="NO IMPLEMENTADO"
+                            ${item.estado_implementacion == "NO IMPLEMENTADO" ? "selected" : ""}>
+                            NO IMPLEMENTADO
+                        </option>
+
+                    </select>
+                </td>
+
+                <td>
+                    <button onclick="guardarControl(${item.id})">
+                        Guardar
+                    </button>
+                </td>
+
+            </tr>
+        `;
     });
+}
+
+async function guardarControl(id) {
+
+    const aplica =
+        document.getElementById(`aplica-${id}`).value;
+
+    const justificacion =
+        document.getElementById(`justificacion-${id}`).value;
+
+    const estado =
+        document.getElementById(`estado-${id}`).value;
+
+    const formData = new FormData();
+
+    formData.append("aplica", aplica === "true");
+    formData.append("justificacion", justificacion);
+    formData.append("estado_implementacion", estado);
+
+    const response = await fetch(`/api/soa/control/${id}`, {
+        method: "PUT",
+        body: formData
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        alert(data.detail);
+        return;
+    }
+
+    alert(data.message);
 }
 
 async function incluirControl(id) {
@@ -234,10 +360,54 @@ async function excluirControl(id) {
     alert("Control excluido");
 }
 
+async function cargarOrganizaciones() {
+
+    const response = await fetch(
+        "/api/soa/organizations"
+    );
+
+    const data = await response.json();
+
+    const select = document.getElementById(
+        "organizacion"
+    );
+
+    data.forEach(org => {
+
+        select.innerHTML += `
+            <option value="${org.id}">
+                ${org.nombre}
+            </option>
+        `;
+    });
+}
+
+async function cargarControles() {
+
+    const response = await fetch("/api/control/listar-controles");
+
+    const data = await response.json();
+
+    const select = document.getElementById("controles");
+
+    select.innerHTML = "";
+
+    data.forEach(control => {
+
+        select.innerHTML += `
+            <option value="${control.id}">
+                ${control.codigo} - ${control.descripcion}
+            </option>
+        `;
+    });
+}
+
 function descargarDocumento(id) {
     window.open(`/api/soa/generate-doc/${id}`, '_blank');
 }
 
+cargarOrganizaciones();
+cargarControles();
 cargarSoA();
 
 </script>
