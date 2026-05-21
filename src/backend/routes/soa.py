@@ -240,6 +240,7 @@ def detalle_soa(
         result = db.execute(
             text("""
                 SELECT
+                    sc.id,
                     c.codigo,
                     c.descripcion,
                     sc.aplica,
@@ -258,12 +259,13 @@ def detalle_soa(
 
         return [
             {
-                "codigo": r[0],
-                "descripcion": r[1],
-                "aplica": r[2],
-                "justificacion_inclusion": r[3],
-                "justificacion_exclusion": r[4],
-                "estado_implementacion": r[5]
+                "id": r[0],
+                "codigo": r[1],
+                "descripcion": r[2],
+                "aplica": r[3],
+                "justificacion_inclusion": r[4],
+                "justificacion_exclusion": r[5],
+                "estado_implementacion": r[6]
             }
             for r in rows
         ]
@@ -406,4 +408,77 @@ def generar_documento_soa(
         raise HTTPException(
             status_code=500,
             detail=f"Error al generar documento: {str(e)}"
+        )
+
+@router.put("/control/{soa_control_id}")
+def actualizar_control_soa(
+    soa_control_id: int,
+    aplica: bool = Form(...),
+    justificacion: str = Form(...),
+    estado_implementacion: str = Form(...),
+    db: Session = Depends(get_db)
+):
+
+    try:
+
+        existe = db.execute(text("""
+            SELECT id
+            FROM soa_control
+            WHERE id = :id
+        """), {
+            "id": soa_control_id
+        }).fetchone()
+
+        if not existe:
+            raise HTTPException(
+                status_code=404,
+                detail="Control del SoA no encontrado"
+            )
+
+        if aplica:
+
+            db.execute(text("""
+                UPDATE soa_control
+                SET
+                    aplica = :aplica,
+                    justificacion_inclusion = :justificacion,
+                    justificacion_exclusion = NULL,
+                    estado_implementacion = :estado
+                WHERE id = :id
+            """), {
+                "id": soa_control_id,
+                "aplica": aplica,
+                "justificacion": justificacion,
+                "estado": estado_implementacion
+            })
+
+        else:
+
+            db.execute(text("""
+                UPDATE soa_control
+                SET
+                    aplica = :aplica,
+                    justificacion_inclusion = NULL,
+                    justificacion_exclusion = :justificacion,
+                    estado_implementacion = 'NO APLICA'
+                WHERE id = :id
+            """), {
+                "id": soa_control_id,
+                "aplica": aplica,
+                "justificacion": justificacion
+            })
+
+        db.commit()
+
+        return {
+            "message": "Control actualizado correctamente"
+        }
+
+    except Exception as e:
+
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
         )

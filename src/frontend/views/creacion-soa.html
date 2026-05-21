@@ -66,6 +66,8 @@
             <th>Descripción</th>
             <th>Incluido</th>
             <th>Justificación</th>
+            <th>Estado</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody id="detalleSoA"></tbody>
@@ -139,14 +141,97 @@ async function verDetalle(id) {
     data.forEach(item => {
 
         tabla.innerHTML += `
-            <tr>
-                <td>${item.codigo}</td>
-                <td>${item.descripcion}</td>
-                <td>${item.aplica}</td>
-                <td>${item.justificacion_inclusion}</td>
-            </tr>
-        `;
+        <tr>
+            <td>${item.codigo}</td>
+
+            <td>${item.descripcion}</td>
+
+           <td>${item.aplica ? 'Sí' : 'No'}</td>
+
+            <td>
+                ${
+                    item.aplica
+                    ? item.justificacion_inclusion
+                    : item.justificacion_exclusion
+                }
+            </td>
+
+            <td>
+                ${item.estado_implementacion}
+            </td>
+
+            <td>
+                <button onclick="incluirControl(${item.id})">
+                    Incluir
+                </button>
+
+                <button onclick="excluirControl(${item.id})">
+                    Excluir
+                </button>
+            </td>
+        </tr>
+    `;
     });
+}
+
+async function incluirControl(id) {
+
+    const justificacion = prompt(
+        "Justificación de inclusión:"
+    );
+
+    if (!justificacion) return;
+
+    const formData = new FormData();
+
+    formData.append("aplica", true);
+
+    formData.append(
+        "justificacion",
+        justificacion
+    );
+
+    formData.append(
+        "estado_implementacion",
+        "IMPLEMENTADO"
+    );
+
+    await fetch(`/api/soa/control/${id}`, {
+        method: "PUT",
+        body: formData
+    });
+
+    alert("Control incluido");
+}
+
+async function excluirControl(id) {
+
+    const justificacion = prompt(
+        "Justificación de exclusión:"
+    );
+
+    if (!justificacion) return;
+
+    const formData = new FormData();
+
+    formData.append("aplica", false);
+
+    formData.append(
+        "justificacion",
+        justificacion
+    );
+
+    formData.append(
+        "estado_implementacion",
+        "NO APLICA"
+    );
+
+    await fetch(`/api/soa/control/${id}`, {
+        method: "PUT",
+        body: formData
+    });
+
+    alert("Control excluido");
 }
 
 function descargarDocumento(id) {
