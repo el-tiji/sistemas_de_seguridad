@@ -21,6 +21,21 @@ def register(
     hashed_password = pwd_context.hash(password)
 
     try:
+        total_users = db.execute(text("""
+            SELECT COUNT(*)
+            FROM usuario
+        """)).scalar()
+
+        roles_validos = ["admin","empresa", "usuario"]
+
+        # =========================================
+        # ASIGNAR ROL
+        # =========================================
+        if total_users == 0:
+            rol = "admin"
+        else:
+            rol = rol.lower.strip()
+
         db.execute(text("""
             INSERT INTO usuario (email, password, rol) VALUES (:email, :password, :rol)
         """), {"email": email, "password": hashed_password, "rol": rol})

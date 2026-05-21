@@ -24,6 +24,18 @@ def validar_sesion(request: Request):
 
     return user_id
 
+
+def validar_admin(request: Request):
+
+    validar_sesion(request)
+
+    rol = request.session.get("rol")
+
+    if rol != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="No autorizado"
+        )
 # =========================================
 # GENERAR SOA
 # =========================================
@@ -37,6 +49,7 @@ def generate_soa(
 ):
     
     validar_sesion(request)
+    validar_admin(request)
 
     try:
 
