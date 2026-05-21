@@ -46,6 +46,7 @@ def crear_control(
 
     # Validar sesión
     validar_sesion(request)
+    validar_admin(request)
 
     try:
 

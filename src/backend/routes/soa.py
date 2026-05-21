@@ -287,6 +287,7 @@ def generar_documento_soa(
     db: Session = Depends(get_db)
 ):
     validar_sesion(request)
+    validar_admin(request)
 
     try:
 
