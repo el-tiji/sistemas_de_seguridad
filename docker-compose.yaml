@@ -9,7 +9,7 @@ services:
 
     environment:
       POSTGRES_DB: sgsi_1urk
-      POSTGRES_USER: root
+      POSTGRES_USER: sgsiproyecto_wp2q_user
       POSTGRES_PASSWORD: FqttuG8fLqRHrjQaPkUynTDjTa0NTY72
 
     ports:
