@@ -24,6 +24,18 @@ def validar_sesion(request: Request):
 
     return user_id
 
+def validar_auditor(request: Request):
+
+    validar_sesion(request)
+
+    rol = request.session.get("rol")
+
+    if rol != "auditor":
+        raise HTTPException(
+            status_code=403,
+            detail="No autorizado"
+        )
+
 
 def validar_admin(request: Request):
 
@@ -49,7 +61,7 @@ def generate_soa(
 ):
     
     validar_sesion(request)
-    validar_admin(request)
+    validar_auditor(request)
 
     try:
 
@@ -284,7 +296,7 @@ def generar_documento_soa(
     db: Session = Depends(get_db)
 ):
     validar_sesion(request)
-    validar_admin(request)
+    validar_auditor(request)
 
     try:
 

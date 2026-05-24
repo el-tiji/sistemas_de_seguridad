@@ -26,7 +26,7 @@ def register(
             FROM usuario
         """)).scalar()
 
-        roles_validos = ["admin","empresa", "usuario"]
+        roles_validos = ["admin","empresa", "usuario","auditor"]
 
         # =========================================
         # ASIGNAR ROL

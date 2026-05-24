@@ -32,6 +32,18 @@ def validar_admin(request: Request):
             status_code=403,
             detail="No autorizado"
         )
+
+def validar_auditor(request: Request):
+
+    validar_sesion(request)
+
+    rol = request.session.get("rol")
+
+    if rol != "auditor":
+        raise HTTPException(
+            status_code=403,
+            detail="No autorizado"
+        )
 # =========================================
 # CREAR CONTROL
 # =========================================
@@ -46,7 +58,9 @@ def crear_control(
 
     # Validar sesión
     validar_sesion(request)
-    validar_admin(request)
+
+    #validar auditor
+    validar_auditor(request)
 
     try:
 
