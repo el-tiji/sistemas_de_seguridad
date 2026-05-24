@@ -2,29 +2,26 @@ version: '3'
 
 services:
 
-  mysql:
-    image: mysql:8
+  postgres:
+    image: postgres:16
 
-    container_name: sgsi_mysql
+    container_name: sgsi_postgres
 
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: sgsi
-      MYSQL_USER: sgsi_user
-      MYSQL_PASSWORD: sgsi_password
+      POSTGRES_DB: sgsi_1urk
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: FqttuG8fLqRHrjQaPkUynTDjTa0NTY72
 
     ports:
-      - "5001:3306"
-
-    volumes:
-        - ./src/backend/db/database.sql:/docker-entrypoint-initdb.d/database.sql
+      - "5432:5432"
 
   backend:
     build: .
+
     container_name: sgsi_api
 
     depends_on:
-      - mysql
+      - postgres
 
     ports:
       - "8000:8000"
