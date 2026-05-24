@@ -99,35 +99,33 @@ def generate_soa(
         # =========================================
         # CREAR SOA
         # =========================================
-        result = db.execute(
-        text("""
-            INSERT INTO soa (
-                organizacion_id,
-                version,
-                responsable,
-                descripcion,
-                estado
-            )
-            VALUES (
-                :organizacion_id,
-                :version,
-                :responsable,
-                :descripcion,
-                :estado
-            )
-        """),
-        {
-            "organizacion_id": organizacion_id,
-            "version": new_version,
-            "responsable": responsable,
-            "descripcion": descripcion,
-            "estado": "ACTIVO"
-        }
-    )
+        soa_id = db.execute(
+            text("""
+                INSERT INTO soa (
+                    organizacion_id,
+                    version,
+                    responsable,
+                    descripcion,
+                    estado
+                )
+                VALUES (
+                    :organizacion_id,
+                    :version,
+                    :responsable,
+                    :descripcion,
+                    :estado
+                )
+                RETURNING id
+            """),
+            {
+                "organizacion_id": organizacion_id,
+                "version": new_version,
+                "responsable": responsable,
+                "descripcion": descripcion,
+                "estado": "ACTIVO"
+            }
+        ).scalar()
 
-        db.commit()
-
-        soa_id = result.lastrowid
 
         # =========================================
         # INSERTAR CONTROLES

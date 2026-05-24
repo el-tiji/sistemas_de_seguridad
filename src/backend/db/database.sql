@@ -1,28 +1,28 @@
 CREATE TABLE usuario (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(100) UNIQUE,
-    password VARCHAR(255),
-    rol VARCHAR(50),
-    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    rol VARCHAR(50) NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- =========================
 -- ORGANIZACION
 -- =========================
 CREATE TABLE organizacion (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(200),
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(200) NOT NULL,
     descripcion TEXT,
     alcance_sgsi TEXT,
-    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- =========================
 -- CONTROLES ISO
 -- =========================
 CREATE TABLE control (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    codigo VARCHAR(20),
+    id SERIAL PRIMARY KEY,
+    codigo VARCHAR(20) UNIQUE NOT NULL,
     nombre VARCHAR(255),
     descripcion TEXT,
     estado VARCHAR(50),
@@ -30,16 +30,16 @@ CREATE TABLE control (
 );
 
 -- =========================
--- SOA (Cabecera)
+-- SOA
 -- =========================
 CREATE TABLE soa (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
 
-    organizacion_id INT,
+    organizacion_id INTEGER NOT NULL,
 
-    version INT NOT NULL,
+    version INTEGER NOT NULL,
 
-    fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     responsable VARCHAR(100),
 
@@ -47,20 +47,24 @@ CREATE TABLE soa (
 
     estado VARCHAR(50),
 
-    FOREIGN KEY (organizacion_id)
-    REFERENCES organizacion(id)
-    ON DELETE CASCADE
+    CONSTRAINT fk_soa_organizacion
+        FOREIGN KEY (organizacion_id)
+        REFERENCES organizacion(id)
+        ON DELETE CASCADE
 );
 
+-- =========================
+-- RELACION SOA-CONTROL
+-- =========================
 CREATE TABLE soa_control (
 
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
 
-    soa_id INT NOT NULL,
+    soa_id INTEGER NOT NULL,
 
-    control_id INT NOT NULL,
+    control_id INTEGER NOT NULL,
 
-    aplica BOOLEAN NOT NULL,
+    aplica BOOLEAN NOT NULL DEFAULT TRUE,
 
     justificacion_inclusion TEXT,
 
@@ -68,53 +72,27 @@ CREATE TABLE soa_control (
 
     estado_implementacion VARCHAR(50),
 
-    FOREIGN KEY (soa_id)
+    CONSTRAINT fk_soa_control_soa
+        FOREIGN KEY (soa_id)
         REFERENCES soa(id)
         ON DELETE CASCADE,
 
-    FOREIGN KEY (control_id)
+    CONSTRAINT fk_soa_control_control
+        FOREIGN KEY (control_id)
         REFERENCES control(id)
         ON DELETE CASCADE
-
-);
-
--- =========================
--- SOA DETALLE
--- Relación entre SOA y Controles
--- =========================
-CREATE TABLE soa_detalle (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-
-    soa_id INT,
-
-    control_id INT,
-
-    incluido BOOLEAN NOT NULL,
-
-    justificacion_inclusion TEXT,
-
-    justificacion_exclusion TEXT,
-
-    estado_implementacion VARCHAR(50),
-
-    FOREIGN KEY (soa_id)
-    REFERENCES soa(id)
-    ON DELETE CASCADE,
-
-    FOREIGN KEY (control_id)
-    REFERENCES control(id)
-    ON DELETE CASCADE
 );
 
 -- =========================
 -- RIESGOS
 -- =========================
 CREATE TABLE riesgo (
-    id INT AUTO_INCREMENT PRIMARY KEY,
 
-    organizacion_id INT,
+    id SERIAL PRIMARY KEY,
 
-    descripcion TEXT,
+    organizacion_id INTEGER NOT NULL,
+
+    descripcion TEXT NOT NULL,
 
     impacto VARCHAR(50),
 
@@ -124,39 +102,44 @@ CREATE TABLE riesgo (
 
     tratamiento VARCHAR(50),
 
-    fecha_identificacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+    fecha_identificacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (organizacion_id)
-    REFERENCES organizacion(id)
-    ON DELETE CASCADE
+    CONSTRAINT fk_riesgo_organizacion
+        FOREIGN KEY (organizacion_id)
+        REFERENCES organizacion(id)
+        ON DELETE CASCADE
 );
 
 -- =========================
 -- RELACION RIESGO-CONTROL
 -- =========================
 CREATE TABLE riesgo_control (
-    id INT AUTO_INCREMENT PRIMARY KEY,
 
-    riesgo_id INT,
+    id SERIAL PRIMARY KEY,
 
-    control_id INT,
+    riesgo_id INTEGER NOT NULL,
 
-    FOREIGN KEY (riesgo_id)
-    REFERENCES riesgo(id)
-    ON DELETE CASCADE,
+    control_id INTEGER NOT NULL,
 
-    FOREIGN KEY (control_id)
-    REFERENCES control(id)
-    ON DELETE CASCADE
+    CONSTRAINT fk_riesgo_control_riesgo
+        FOREIGN KEY (riesgo_id)
+        REFERENCES riesgo(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_riesgo_control_control
+        FOREIGN KEY (control_id)
+        REFERENCES control(id)
+        ON DELETE CASCADE
 );
 
 -- =========================
 -- AUDITORIAS
 -- =========================
 CREATE TABLE auditoria (
-    id INT AUTO_INCREMENT PRIMARY KEY,
 
-    organizacion_id INT,
+    id SERIAL PRIMARY KEY,
+
+    organizacion_id INTEGER NOT NULL,
 
     tipo VARCHAR(50),
 
@@ -168,20 +151,22 @@ CREATE TABLE auditoria (
 
     resultado TEXT,
 
-    FOREIGN KEY (organizacion_id)
-    REFERENCES organizacion(id)
-    ON DELETE CASCADE
+    CONSTRAINT fk_auditoria_organizacion
+        FOREIGN KEY (organizacion_id)
+        REFERENCES organizacion(id)
+        ON DELETE CASCADE
 );
 
 -- =========================
 -- HALLAZGOS
 -- =========================
 CREATE TABLE hallazgo (
-    id INT AUTO_INCREMENT PRIMARY KEY,
 
-    auditoria_id INT,
+    id SERIAL PRIMARY KEY,
 
-    control_id INT,
+    auditoria_id INTEGER NOT NULL,
+
+    control_id INTEGER,
 
     tipo VARCHAR(50),
 
@@ -189,11 +174,13 @@ CREATE TABLE hallazgo (
 
     estado VARCHAR(50),
 
-    FOREIGN KEY (auditoria_id)
-    REFERENCES auditoria(id)
-    ON DELETE CASCADE,
+    CONSTRAINT fk_hallazgo_auditoria
+        FOREIGN KEY (auditoria_id)
+        REFERENCES auditoria(id)
+        ON DELETE CASCADE,
 
-    FOREIGN KEY (control_id)
-    REFERENCES control(id)
-    ON DELETE SET NULL
+    CONSTRAINT fk_hallazgo_control
+        FOREIGN KEY (control_id)
+        REFERENCES control(id)
+        ON DELETE SET NULL
 );

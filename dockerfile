@@ -2,8 +2,7 @@ FROM python:3.11
 
 WORKDIR /app
 
-COPY . .
-
-RUN pip install fastapi python-dotenv uvicorn sqlalchemy pymysql python-multipart python-docx passlib[bcrypt] cryptography itsdangerous
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["uvicorn", "src.backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -6,7 +6,7 @@ import os
   
 load_dotenv()
 
-# Configuración de la conexión a la base de datos MySQL usando SQLAlchemy
+# Configuración de la conexión a la base de datos Postgres usando SQLAlchemy
 DATABASE_URL = os.getenv("DATABASE_URL")
 
   
@@ -32,7 +32,7 @@ def get_db():
 if __name__ == "__main__":
     try:
         db = SessionLocal()
-        print("✅ Conexión exitosa a MySQL")
+        print("✅ Conexión exitosa a Postgres")
 
         result = db.execute(text("""
             SHOW TABLES;
