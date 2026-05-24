@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+sqlalchemy
+pymysql
+python-multipart
+passlib
+bcrypt
+python-dotenv
+python-docx
+jinja2
+itsdangerous
