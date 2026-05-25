@@ -47,6 +47,7 @@ def crear_organizacion(
 ):
 
     validar_sesion(request)
+    validar_auditor(request)
 
     try:
 
