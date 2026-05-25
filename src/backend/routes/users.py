@@ -31,10 +31,7 @@ def register(
         # =========================================
         # ASIGNAR ROL
         # =========================================
-        if total_users == 0:
-            rol = "admin"
-        else:
-            rol = rol.lower().strip()
+        
 
         db.execute(text("""
             INSERT INTO usuario (email, password, rol) VALUES (:email, :password, :rol)
